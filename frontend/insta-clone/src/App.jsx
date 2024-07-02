@@ -7,6 +7,7 @@ import Profile from "./components/Profile"
 import {BrowserRouter,Routes,Route} from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CreatePost from './components/CreatePost'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path = "/signin" element={<Signin/>}></Route>
       <Route path = "/signup" element={<Signup/>}></Route>
       <Route path = "/Profile" element={<Profile/>}></Route>
+      <Route path = "/createpost" element={<CreatePost/>}></Route>
     </Routes>
     <ToastContainer theme='light'></ToastContainer>
    </div>
