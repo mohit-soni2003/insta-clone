@@ -1,17 +1,14 @@
-import React from 'react'
+import { useEffect, useState , useContext, } from "react";
 import "./Signin.css"
 import Logo from "../img/Logo.png";
-import { Link , Navigate, useNavigate} from "react-router-dom";
-import { useEffect, useState  } from "react";
+import { Link , useNavigate} from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
-
-
-
-
-
+import  LoginContext  from "../context/LoginContext";
 
 
 export default function Signin() {
+
+  const {setuserLogin} = useContext(LoginContext)
 
   const navigate = useNavigate()
 
@@ -47,14 +44,17 @@ const postData = ()=>{
       }
   ).then(res=>res.json())
   .then(data =>{
-      if(data.message){
+    if(data.error){
+        notifyB(data.error)
+    }
+    else{
           notifyA(data.message)
+          console.log(data.message)
+          localStorage.setItem("jwt",data)
+          setuserLogin(true)
           navigate("/")
         }
         
-      if(data.error){
-          notifyB(data.error)
-      }
       console.log(data)})
   
 //Toast Function --------- ------ --------- -------

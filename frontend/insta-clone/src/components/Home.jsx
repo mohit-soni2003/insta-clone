@@ -1,7 +1,27 @@
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+
 import "./Home.css"
-export default function Home(){
-    return(
-        
+export default function Home() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        const token = localStorage.getItem("jwt")
+        if (!token) {
+            navigate("./signup")
+        }
+        //Fetch posts from server
+        fetch("http://localhost:8080/allpost", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("jwt")
+            },
+        }).then(res=>res.json())
+        .then(result=>console.log(result))
+        .catch(err=>console.log(err))
+    }, [])
+
+
+    return (
+
         <div className="home">
             {/* card */}
 
@@ -19,15 +39,15 @@ export default function Home(){
                 </div>
                 {/* card-content */}
                 <div className="card-content">
-                <span className="material-symbols-outlined">favorite</span>
-                <p>1 Like</p>
-                <p>this is caption</p>
+                    <span className="material-symbols-outlined">favorite</span>
+                    <p>1 Like</p>
+                    <p>this is caption</p>
                 </div>
                 {/* card-comment */}
                 <div className="add-comment">
-                <span className="material-symbols-outlined smiley-icon">mood</span>
-                <input type="text" placeholder="Add a comment" />
-                <button className="comment">Post</button>
+                    <span className="material-symbols-outlined smiley-icon">mood</span>
+                    <input type="text" placeholder="Add a comment" />
+                    <button className="comment">Post</button>
 
                 </div>
             </div>

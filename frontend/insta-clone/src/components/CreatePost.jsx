@@ -1,14 +1,98 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import "./CreatePost.css"
+import { toast } from 'react-toastify'
+import { useNavigate } from "react-router-dom";
+
 
 export default function CreatePost() {
 
-    const loadFile = (event)=>{
-        var output = document.getElementById('output');
-    output.src = URL.createObjectURL(event.target.files[0]);
-    output.onload = function() {
-      URL.revokeObjectURL(output.src) // free memory
+    const navigate = useNavigate()
+
+    const [body, setbody] = useState("")
+    const [Image, setImage] = useState("")
+    const [url, seturl] = useState("")
+
+    //Toast Function --------- ------ --------- -------
+
+    const notifyA = (msg) => toast.success(msg)
+    const notifyB = (msg) => toast.error(msg)
+
+    // when the url is set by cloudanary then useEffwct is run 
+
+    useEffect(() => {
+        //Saving post to mongodb
+
+        if (url) {
+            fetch("http://localhost:8080/createPost",
+                {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem("jwt")
+                    },
+                    body: JSON.stringify({
+                        body,
+                        pic: url
+                    })
+                }
+            )
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        notifyB(data.error)
+                    }
+                    else {
+                        notifyA("Successsfully Posted")
+                        navigate("/")
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+
+    }, [url])
+
+
+    //posting image to cloudinary--------- ---------- ---------- ------- 
+
+    const postDetails = () => {
+        if (!Image) {
+            notifyB("Please Select Image")
+        }
+        console.log(Image, body)
+        const data = new FormData();
+        data.append("file", Image)
+        data.append("upload_preset", "insta-clone")
+        data.append("cloud_name", "mohitcloud2003")
+        fetch("https://api.cloudinary.com/v1_1/mohitcloud2003/image/upload",
+            {
+                method: "post",
+                body: data
+            })
+            .then(res => res.json())
+            .then(data => seturl(data.url))
+            .catch(err => { console.log(err) })
+
+        //Saving post to mongodb
+
     }
+
+
+
+    const handleBodyChange = (event) => {
+        console.log(event.target)
+        setbody(event.target.value)
+    }
+
+
+
+    const loadFile = (event) => {
+        var output = document.getElementById('output');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function () {
+            URL.revokeObjectURL(output.src) // free memory
+
+            setImage(event.target.files[0])
+        }
 
     }
     return (
@@ -18,7 +102,7 @@ export default function CreatePost() {
 
             <div className="post-header">
                 <h4>Create New Post</h4>
-                <button id="post-btn">Share</button>
+                <button id="post-btn" onClick={postDetails}>Share</button>
             </div>
 
             {/* image preview */}
@@ -38,7 +122,7 @@ export default function CreatePost() {
                     <h5>Ramesh</h5>
                 </div>
 
-                <textarea type="text" placeholder='write a caption' name="" id=""></textarea>
+                <textarea value={body} onChange={handleBodyChange} type="text" placeholder='write a caption' name="" id=""></textarea>
 
             </div>
         </div>
